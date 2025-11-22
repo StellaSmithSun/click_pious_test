@@ -17,14 +17,12 @@
 window.onload = function() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
-    if (!userId) {
-        alert("请从 Telegram 内打开此网页！");
-        // 阻止游戏初始化
-        return;
+    if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+        userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        console.log("Telegram User ID:", userId);
+    } else {
+        console.log("非 Telegram 环境，仅本地游戏模式");
     }
-
-    // userId 已经安全获取
-    console.log("Telegram User ID:", userId);
 
 
     let count = parseInt(localStorage.getItem("count") || "0");
