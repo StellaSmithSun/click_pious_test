@@ -15,15 +15,21 @@
 
 <script defer>
 window.onload = function() {
-    // 检查是否在 Telegram WebApp 里
-    if (!window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+
+    if (!userId) {
         alert("请从 Telegram 内打开此网页！");
-        // 可以选择阻止游戏加载
+        // 阻止游戏初始化
         return;
     }
+
+    // userId 已经安全获取
+    console.log("Telegram User ID:", userId);
+
+
     let count = parseInt(localStorage.getItem("count") || "0");
 
-    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+
 
 // window.onload = function() {
 //     // 从 localStorage 读取点击次数，如果没有就初始化为 0
