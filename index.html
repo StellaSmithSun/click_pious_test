@@ -13,21 +13,20 @@
 <body>
 
 <script>
+    // 整个脚本直接在全局作用域内执行
     let userId = null; // 初始化为 null
     let count = parseInt(localStorage.getItem("count") || "0"); // 从 localStorage 读取计数
 
     // --- 1. Phaser 游戏核心函数 ---
 
     function preload() {
-        // ❗❗ 使用绝对路径来修复加载不稳定的问题 ❗❗
-        // 假设您的图片在 https://stellasmithsun.github.io/click_pious_test/assets/muyu.png
-        this.load.image("muyu", "assets/muyu.png"); // 如果 assets/muyu.png 路径失败，请使用绝对路径！
-        // 示例绝对路径 (请替换成您实际的 GitHub Pages 路径)：
+        // ❗❗ 建议使用绝对路径 ❗❗
+        // 请替换成您实际的 GitHub Pages 路径，例如:
         // this.load.image("muyu", "https://stellasmithsun.github.io/click_pious_test/assets/muyu.png"); 
+        this.load.image("muyu", "assets/muyu.png"); 
     }
 
     function create() {
-        // ... (内容与您的原代码相同) ...
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
@@ -79,7 +78,7 @@
         });
     }
 
-    // --- 2. TWA 健壮初始化和游戏启动逻辑 (解决 userId 和卡顿问题) ---
+    // --- 2. TWA 健壮初始化和游戏启动逻辑 ---
 
     function startGame() {
         console.log("🎮 启动 Phaser 游戏...");
