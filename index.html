@@ -13,30 +13,29 @@
 
 <script>
 window.onload = function() {
-    let userId = null; // 初始化为 null
-    let count = parseInt(localStorage.getItem("count") || "0"); // 从 localStorage 读取计数
+let userId = null; // 初始化为 null
+@@ -19,112 +6,84 @@
+// --- 1. Phaser 游戏核心函数 ---
 
-    // --- 1. Phaser 游戏核心函数 ---
-
-    function preload() {
+function preload() {
         // TODO: 替换为您的实际图片路径，例如 "assets/muyu.png"
-        this.load.image("muyu", "assets/muyu.png"); 
+        // this.load.image("muyu", "assets/muyu.png"); 
         // ❗❗❗ 请将以下 URL 替换为您图片文件 (muyu.png) 的完整、可访问的 URL ❗❗❗
         // 示例：如果您的游戏使用 ngrok 转发，并且图片在 /assets 目录下：
         this.load.image("muyu", "https://glady-nongelling-mila.ngrok-free.dev/assets/muyu.png"); 
         
         // 或是您自己的域名：
         // this.load.image("muyu", "https://your-domain.com/your-game-folder/assets/muyu.png"); 
-    }
+}
 
-    function create() {
+function create() {
         // ... (其余代码保持不变) ...
-        const centerX = this.cameras.main.centerX;
-        const centerY = this.cameras.main.centerY;
+const centerX = this.cameras.main.centerX;
+const centerY = this.cameras.main.centerY;
 
-        const muyu = this.add.image(centerX, centerY, "muyu")
-            .setScale(0.4)
-            .setInteractive();
+const muyu = this.add.image(centerX, centerY, "muyu")
+.setScale(0.4)
+.setInteractive();
 
         const text = this.add.text(centerX, 80, "功德: " + count, {
             fontSize: "32px",
@@ -59,7 +58,7 @@ window.onload = function() {
             });
         });
         // ... (省略) ...
-    }
+}
 
     const config = {
         type: Phaser.AUTO,
@@ -73,24 +72,29 @@ window.onload = function() {
     };
     // ... (config 和 onClicked 函数不变) ...
 
-    function onClicked() {
-        console.log(`发送点击信号，User ID: ${userId || 'N/A'}`);
+function onClicked() {
+console.log(`发送点击信号，User ID: ${userId || 'N/A'}`);
         
-        // 注意：ngrok-free.dev 域名可能随时过期，请确保链接有效
-        fetch("https://glady-nongelling-mila.ngrok-free.dev/click", {
-            method: "POST",
-@@ -79,52 +41,49 @@
-        });
-    }
+// 注意：ngrok-free.dev 域名可能随时过期，请确保链接有效
+fetch("https://glady-nongelling-mila.ngrok-free.dev/click", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({
+user_id: userId
+})
+}).catch(e => {
+console.error("发送点击信号失败:", e);
+});
+}
 
     // --- 2. TWA 初始化和游戏启动逻辑 ---
 
     // --- 2. TWA 初始化和游戏启动逻辑 (保持不变) ---
     // ... (这部分代码是健壮的，不应该影响图片加载) ...
-    function startGame() {
-        // 只有当 TWA 逻辑处理完毕后，才启动 Phaser 游戏实例
-        new Phaser.Game(config);
-    }
+function startGame() {
+// 只有当 TWA 逻辑处理完毕后，才启动 Phaser 游戏实例
+new Phaser.Game(config);
+}
 
     let isWebAppReady = false; // 标志位
     let isWebAppReady = false; 
@@ -98,46 +102,46 @@ window.onload = function() {
     // 设置一个超时，防止在某些 TWA 客户端上卡住
     const timeoutDuration = 1500; // 1.5 秒
     const timeoutDuration = 1500; 
-    const timeoutId = setTimeout(() => {
-        if (!isWebAppReady) {
-            console.warn("⚠️ Telegram WebApp 接口超时 (未调用 ready)，以本地模式启动。");
+const timeoutId = setTimeout(() => {
+if (!isWebAppReady) {
+console.warn("⚠️ Telegram WebApp 接口超时 (未调用 ready)，以本地模式启动。");
             // alert("⚠️ Telegram WebApp 接口超时，以本地模式启动。"); // 移除 alert
-            startGame();
-        }
-    }, timeoutDuration);
+startGame();
+}
+}, timeoutDuration);
 
-    if (window.Telegram && window.Telegram.WebApp) {
+if (window.Telegram && window.Telegram.WebApp) {
         // 在 TWA 环境下，等待 ready 信号
-        window.Telegram.WebApp.ready(() => {
+window.Telegram.WebApp.ready(() => {
             clearTimeout(timeoutId); // 清除超时
             clearTimeout(timeoutId); 
-            isWebAppReady = true;
+isWebAppReady = true;
 
             // 安全地获取 userId
-            userId = window.Telegram.WebApp.initDataUnsafe?.user?.id || null;
+userId = window.Telegram.WebApp.initDataUnsafe?.user?.id || null;
 
-            if (userId) {
-                console.log(`✅ Telegram User ID 获取成功: ${userId}`);
-                alert(`✅ Telegram User ID 获取成功: ${userId}`);
+if (userId) {
+console.log(`✅ Telegram User ID 获取成功: ${userId}`);
+alert(`✅ Telegram User ID 获取成功: ${userId}`);
                 // alert(`✅ Telegram User ID 获取成功: ${userId}`); // 移除 alert
-            } else {
-                console.warn("⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。");
-                alert(`⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。`);
+} else {
+console.warn("⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。");
+alert(`⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。`);
                 // alert(`⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。`); // 移除 alert
-            }
+}
 
             startGame(); // ready 后启动游戏
             startGame(); 
-        });
-    } else {
+});
+} else {
         // 非 Telegram 环境，立即启动游戏
-        clearTimeout(timeoutId);
-        console.warn("❌ 非 Telegram 环境，立即启动游戏。");
+clearTimeout(timeoutId);
+console.warn("❌ 非 Telegram 环境，立即启动游戏。");
         alert("❌ 非 Telegram 环境，立即启动游戏。");
         alert(`❌ 非 Telegram 环境，立即启动游戏。`);
         // alert("❌ 非 Telegram 环境，立即启动游戏。"); // 移除 alert
-        startGame();
-    }
+startGame();
+}
 };
 </script>
 
