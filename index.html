@@ -15,15 +15,8 @@
 
 <script defer>
 window.onload = function() {
-    
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
-    
-    if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
-        userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-        alert("Telegram User ID:", userId);
-    } else {
-        alert("非 Telegram 环境，仅本地游戏模式");
     if (!userId) {
         console.warn("不是在 Telegram 内打开，无法记录用户点击 ID");
         // 这里可以选择： 
@@ -91,7 +84,7 @@ window.onload = function() {
             create: create
         }
     };
-
+    
     //点击后发送signal
     function onClicked() {
         fetch("https://glady-nongelling-mila.ngrok-free.dev/click", {
