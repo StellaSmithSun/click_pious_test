@@ -15,16 +15,14 @@
 
 <script defer>
 window.onload = function() {
-   
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
-    if (!userId) {
-        alert("不是在 Telegram 内打开，无法记录用户点击 IDX");
-        // 这里可以选择： 
-        // 1. 允许游戏加载（本地计数仍然可以）
-        // 2. 或者显示提示，但不要阻止 Phaser 初始化
+    if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+        userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        alter("Telegram User ID:", userId);
+    } else {
+        alter("非 Telegram 环境，仅本地游戏模式");
     }
-
 
 
     let count = parseInt(localStorage.getItem("count") || "0");
