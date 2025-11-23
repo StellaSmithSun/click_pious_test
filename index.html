@@ -1,3 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PiousClick</title>
+
+<script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+<style>
+  body { margin: 0; padding: 0; background: #222; }
+</style>
+</head>
+<body>
+
 <script>
 window.onload = function() {
     let userId = null; // 初始化为 null
@@ -6,29 +19,54 @@ window.onload = function() {
     // --- 1. Phaser 游戏核心函数 ---
 
     function preload() {
-        // ❗❗❗ 请将以下 URL 替换为您图片文件 (muyu.png) 的完整、可访问的 URL ❗❗❗
-        // 示例：如果您的游戏使用 ngrok 转发，并且图片在 /assets 目录下：
+        // ❗❗ 再次强调：请将此 URL 替换为您图片文件 (muyu.png) 的完整、可访问的 URL ❗❗
+        // 示例：如果您使用 ngrok 转发，请确保这里的 ngrok 地址与 fetch 中的地址一致
         this.load.image("muyu", "https://glady-nongelling-mila.ngrok-free.dev/assets/muyu.png"); 
-        
-        // 或是您自己的域名：
-        // this.load.image("muyu", "https://your-domain.com/your-game-folder/assets/muyu.png"); 
     }
 
     function create() {
-        // ... (其余代码保持不变) ...
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
         const muyu = this.add.image(centerX, centerY, "muyu")
             .setScale(0.4)
             .setInteractive();
-        // ... (省略) ...
+
+        const text = this.add.text(centerX, 80, "功德: " + count, {
+            fontSize: "32px",
+            color: "#ffffff"
+        }).setOrigin(0.5);
+
+        muyu.on("pointerdown", () => {
+            count++;
+            localStorage.setItem("count", count);
+            text.setText("功德: " + count);
+            
+            onClicked();
+
+            this.tweens.add({
+                targets: muyu,
+                scale: 0.37,
+                yoyo: true,
+                duration: 100
+            });
+        });
     }
 
-    // ... (config 和 onClicked 函数不变) ...
+    const config = {
+        type: Phaser.AUTO,
+        width: 400,
+        height: 600,
+        backgroundColor: "#222222",
+        scene: {
+            preload: preload,
+            create: create
+        }
+    };
 
     function onClicked() {
         console.log(`发送点击信号，User ID: ${userId || 'N/A'}`);
+        
         // 注意：ngrok-free.dev 域名可能随时过期，请确保链接有效
         fetch("https://glady-nongelling-mila.ngrok-free.dev/click", {
             method: "POST",
@@ -41,49 +79,53 @@ window.onload = function() {
         });
     }
 
-    // --- 2. TWA 初始化和游戏启动逻辑 (保持不变) ---
-    // ... (这部分代码是健壮的，不应该影响图片加载) ...
+    // --- 2. TWA 初始化和游戏启动逻辑 (关键部分) ---
+
     function startGame() {
         // 只有当 TWA 逻辑处理完毕后，才启动 Phaser 游戏实例
+        console.log("🎮 调用 startGame()，启动 Phaser 游戏...");
         new Phaser.Game(config);
     }
     
-    let isWebAppReady = false; 
+    let isWebAppReady = false; // 标志位
 
-    const timeoutDuration = 1500; 
+    // 设置一个超时，防止在某些 TWA 客户端上卡住
+    const timeoutDuration = 1500; // 1.5 秒
     const timeoutId = setTimeout(() => {
         if (!isWebAppReady) {
             console.warn("⚠️ Telegram WebApp 接口超时 (未调用 ready)，以本地模式启动。");
-            // alert("⚠️ Telegram WebApp 接口超时，以本地模式启动。"); // 移除 alert
+            // 【重要】如果这里执行了，说明 TWA 接口在 1.5 秒内未准备好。
             startGame();
         }
     }, timeoutDuration);
 
     if (window.Telegram && window.Telegram.WebApp) {
+        // 在 TWA 环境下，等待 ready 信号
+        console.log("⏳ 检测到 Telegram WebApp 对象，等待 ready 事件...");
         window.Telegram.WebApp.ready(() => {
-            clearTimeout(timeoutId); 
+            clearTimeout(timeoutId); // 清除超时
             isWebAppReady = true;
 
+            // 安全地获取 userId
             userId = window.Telegram.WebApp.initDataUnsafe?.user?.id || null;
             
             if (userId) {
                 console.log(`✅ Telegram User ID 获取成功: ${userId}`);
-               
-                // alert(`✅ Telegram User ID 获取成功: ${userId}`); // 移除 alert
             } else {
-                console.warn("⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。");
-                
-                // alert(`⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。`); // 移除 alert
+                console.warn("⚠️ Telegram 环境下无法获取 User ID (initDataUnsafe 不完整)，以本地模式继续。");
             }
             
-            startGame(); 
+            startGame(); // ready 后启动游戏
         });
     } else {
+        // 非 Telegram 环境，立即启动游戏
         clearTimeout(timeoutId);
         console.warn("❌ 非 Telegram 环境，立即启动游戏。");
-        
-        // alert("❌ 非 Telegram 环境，立即启动游戏。"); // 移除 alert
+        // 【重要】您之前得到的 alert 信息就是从这里发出的
         startGame();
     }
 };
 </script>
+
+</body>
+</html>
