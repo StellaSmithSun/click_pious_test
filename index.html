@@ -19,9 +19,8 @@ window.onload = function() {
     // --- 1. Phaser 游戏核心函数 ---
 
     function preload() {
-        // ❗❗ 再次强调：请将此 URL 替换为您图片文件 (muyu.png) 的完整、可访问的 URL ❗❗
-        // 示例：如果您使用 ngrok 转发，请确保这里的 ngrok 地址与 fetch 中的地址一致
-        this.load.image("muyu", "https://glady-nongelling-mila.ngrok-free.dev/assets/muyu.png"); 
+        // TODO: 替换为您的实际图片路径，例如 "assets/muyu.png"
+        this.load.image("muyu", "assets/muyu.png"); 
     }
 
     function create() {
@@ -42,6 +41,7 @@ window.onload = function() {
             localStorage.setItem("count", count);
             text.setText("功德: " + count);
             
+            // 点击后发送信号（使用全局 userId）
             onClicked();
 
             this.tweens.add({
@@ -79,11 +79,10 @@ window.onload = function() {
         });
     }
 
-    // --- 2. TWA 初始化和游戏启动逻辑 (关键部分) ---
+    // --- 2. TWA 初始化和游戏启动逻辑 ---
 
     function startGame() {
         // 只有当 TWA 逻辑处理完毕后，才启动 Phaser 游戏实例
-        console.log("🎮 调用 startGame()，启动 Phaser 游戏...");
         new Phaser.Game(config);
     }
     
@@ -94,14 +93,12 @@ window.onload = function() {
     const timeoutId = setTimeout(() => {
         if (!isWebAppReady) {
             console.warn("⚠️ Telegram WebApp 接口超时 (未调用 ready)，以本地模式启动。");
-            // 【重要】如果这里执行了，说明 TWA 接口在 1.5 秒内未准备好。
             startGame();
         }
     }, timeoutDuration);
 
     if (window.Telegram && window.Telegram.WebApp) {
         // 在 TWA 环境下，等待 ready 信号
-        console.log("⏳ 检测到 Telegram WebApp 对象，等待 ready 事件...");
         window.Telegram.WebApp.ready(() => {
             clearTimeout(timeoutId); // 清除超时
             isWebAppReady = true;
@@ -111,8 +108,10 @@ window.onload = function() {
             
             if (userId) {
                 console.log(`✅ Telegram User ID 获取成功: ${userId}`);
+                
             } else {
-                console.warn("⚠️ Telegram 环境下无法获取 User ID (initDataUnsafe 不完整)，以本地模式继续。");
+                console.warn("⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。");
+                
             }
             
             startGame(); // ready 后启动游戏
@@ -121,7 +120,7 @@ window.onload = function() {
         // 非 Telegram 环境，立即启动游戏
         clearTimeout(timeoutId);
         console.warn("❌ 非 Telegram 环境，立即启动游戏。");
-        // 【重要】您之前得到的 alert 信息就是从这里发出的
+        
         startGame();
     }
 };
