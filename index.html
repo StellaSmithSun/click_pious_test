@@ -4,47 +4,73 @@
 <meta charset="UTF-8">
 <title>PiousClick</title>
 
-<script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+<!-- 引入 Phaser 3 -->
+<script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js" defer></script>
+
 <style>
   body { margin: 0; padding: 0; background: #222; }
 </style>
 </head>
 <body>
 
-<script>
+<script defer>
 window.onload = function() {
-    let userId = null; // 初始化为 null
-    let count = parseInt(localStorage.getItem("count") || "0"); // 从 localStorage 读取计数
+    
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
-    // --- 1. Phaser 游戏核心函数 ---
-
-    function preload() {
-        // TODO: 替换为您的实际图片路径，例如 "assets/muyu.png"
-        this.load.image("muyu", "https://i.imgur.com/your-muyu-image.png"); 
-        this.load.image("muyu", "assets/muyu.png"); 
+    
+    if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+        userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+        alert("Telegram User ID:", userId);
+    } else {
+        alert("非 Telegram 环境，仅本地游戏模式");
+    if (!userId) {
+        console.warn("不是在 Telegram 内打开，无法记录用户点击 ID");
+        // 这里可以选择： 
+        // 1. 允许游戏加载（本地计数仍然可以）
+        // 2. 或者显示提示，但不要阻止 Phaser 初始化
     }
 
+
+
+    let count = parseInt(localStorage.getItem("count") || "0");
+
+
+
+// window.onload = function() {
+//     // 从 localStorage 读取点击次数，如果没有就初始化为 0
+    // let count = parseInt(localStorage.getItem("count") || "0");
+
+//     // 预加载资源
+    function preload() {
+        this.load.image("muyu", "assets/muyu.png"); // 木鱼图片
+    }
+
+    // 创建场景
     function create() {
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
+        // 添加木鱼图片
         const muyu = this.add.image(centerX, centerY, "muyu")
-            .setScale(0.4)
-            .setInteractive();
+            .setScale(0.4)        // 缩放
+            .setInteractive();    // 可以点击
 
-        const text = this.add.text(centerX, 80, "功德: " + count, {
+        // 添加计数文字
+        const text = this.add.text(centerX, 80, "Count: " + count, {
             fontSize: "32px",
             color: "#ffffff"
         }).setOrigin(0.5);
 
+        // 点击木鱼事件
         muyu.on("pointerdown", () => {
-            count++;
-            localStorage.setItem("count", count);
-            text.setText("功德: " + count);
-
-            // 点击后发送信号（使用全局 userId）
+            count++; // 点击计数
+            localStorage.setItem("count", count); // 存到浏览器
+            text.setText("Count: " + count); // 更新显示
+            //点击后发送signal
             onClicked();
 
+            // 木鱼点击缩放动画
             this.tweens.add({
                 targets: muyu,
                 scale: 0.37,
@@ -54,6 +80,7 @@ window.onload = function() {
         });
     }
 
+    // 游戏配置
     const config = {
         type: Phaser.AUTO,
         width: 400,
@@ -65,63 +92,20 @@ window.onload = function() {
         }
     };
 
+    //点击后发送signal
     function onClicked() {
-        console.log(`发送点击信号，User ID: ${userId || 'N/A'}`);
-
-        // 注意：ngrok-free.dev 域名可能随时过期，请确保链接有效
         fetch("https://glady-nongelling-mila.ngrok-free.dev/click", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: "POST",headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 user_id: userId
-            })
-        }).catch(e => {
-            console.error("发送点击信号失败:", e);
-        });
-    }
+                })
+  });
+}
 
-    // --- 2. TWA 初始化和游戏启动逻辑 ---
-
-    function startGame() {
-        // 只有当 TWA 逻辑处理完毕后，才启动 Phaser 游戏实例
-        new Phaser.Game(config);
-    }
-
-    let isWebAppReady = false; // 标志位
-
-    // 设置一个超时，防止在某些 TWA 客户端上卡住
-    const timeoutDuration = 1500; // 1.5 秒
-    const timeoutId = setTimeout(() => {
-        if (!isWebAppReady) {
-            console.warn("⚠️ Telegram WebApp 接口超时 (未调用 ready)，以本地模式启动。");
-            startGame();
-        }
-    }, timeoutDuration);
-
-    if (window.Telegram && window.Telegram.WebApp) {
-        // 在 TWA 环境下，等待 ready 信号
-        window.Telegram.WebApp.ready(() => {
-            clearTimeout(timeoutId); // 清除超时
-            isWebAppReady = true;
-
-            // 安全地获取 userId
-            userId = window.Telegram.WebApp.initDataUnsafe?.user?.id || null;
-
-            if (userId) {
-                console.log(`✅ Telegram User ID 获取成功: ${userId}`);
-                
-            } else {
-                console.warn("⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。");
-                
-            }
-
-            startGame(); // ready 后启动游戏
-        });
-    } else {
-        // 非 Telegram 环境，立即启动游戏
-        clearTimeout(timeoutId);
-        console.warn("❌ 非 Telegram 环境，立即启动游戏。");
-       
-        startGame();
-    }
+    // 创建 Phaser 游戏实例
+    const game = new Phaser.Game(config);
 };
+</script>
+
+</body>
+</html>
