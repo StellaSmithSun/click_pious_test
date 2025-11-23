@@ -68,11 +68,11 @@ window.onload = function() {
             
             if (userId) {
                 console.log(`✅ Telegram User ID 获取成功: ${userId}`);
-                alert(`✅ Telegram User ID 获取成功: ${userId}`);
+               
                 // alert(`✅ Telegram User ID 获取成功: ${userId}`); // 移除 alert
             } else {
                 console.warn("⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。");
-                alert(`⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。`);
+                
                 // alert(`⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。`); // 移除 alert
             }
             
@@ -81,7 +81,7 @@ window.onload = function() {
     } else {
         clearTimeout(timeoutId);
         console.warn("❌ 非 Telegram 环境，立即启动游戏。");
-        alert(`❌ 非 Telegram 环境，立即启动游戏。`);
+        
         // alert("❌ 非 Telegram 环境，立即启动游戏。"); // 移除 alert
         startGame();
     }
