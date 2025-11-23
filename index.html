@@ -20,7 +20,7 @@ window.onload = function() {
 
     function preload() {
         // TODO: 替换为您的实际图片路径，例如 "assets/muyu.png"
-        this.load.image("muyu", "https://i.imgur.com/your-muyu-image.png"); 
+        this.load.image("muyu", "assets/muyu.png"); 
     }
 
     function create() {
@@ -108,8 +108,10 @@ window.onload = function() {
             
             if (userId) {
                 console.log(`✅ Telegram User ID 获取成功: ${userId}`);
+                alert(`✅ Telegram User ID 获取成功: ${userId}`);
             } else {
                 console.warn("⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。");
+                alert(`⚠️ Telegram 环境下无法获取 User ID，以本地模式继续。`);
             }
             
             startGame(); // ready 后启动游戏
@@ -118,6 +120,7 @@ window.onload = function() {
         // 非 Telegram 环境，立即启动游戏
         clearTimeout(timeoutId);
         console.warn("❌ 非 Telegram 环境，立即启动游戏。");
+        alert("❌ 非 Telegram 环境，立即启动游戏。");
         startGame();
     }
 };
