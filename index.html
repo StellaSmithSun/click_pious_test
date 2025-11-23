@@ -15,13 +15,15 @@
 
 <script defer>
 window.onload = function() {
+    window.Telegram.WebApp.ready();
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
 
+    
     if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
         userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-        alter("Telegram User ID:", userId);
+        alert("Telegram User ID:", userId);
     } else {
-        alter("非 Telegram 环境，仅本地游戏模式");
+        alert("非 Telegram 环境，仅本地游戏模式");
     }
 
 
